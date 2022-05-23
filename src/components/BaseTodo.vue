@@ -10,17 +10,15 @@
     <section>
         <h2>{{ title[0] }} <span>{{ unCompleted.length }}</span></h2>
         <ol>
-            <!-- <li v-for="(item, index) in todos" :key="index" v-show="item.completed == false"> -->
             <li v-for="item in unCompleted" :key="item.id">
-                <input type="checkbox" @click="item.completed = !item.completed"> {{ item.title }} <span
+                <input type="checkbox" @click="changeState(item)"> {{ item.title }} <span
                     @click="removeData(item.id)">&minus;</span>
             </li>
         </ol>
         <h2>{{ title[1] }} <span>{{ completed.length }}</span></h2>
-        <ul>
-            <!-- <li v-for="(item, index) in todos" :key="index" v-show="item.completed == true"> -->
+        <ul> 
             <li :class="{ 'gray': true }" v-for="item in completed" :key="item.id">
-                <input type="checkbox" @click="item.completed = !item.completed" checked> {{ item.title }} <span
+                <input type="checkbox" @click="changeState(item)" checked> {{ item.title }} <span
                     @click="removeData(item.id)">&minus;</span>
             </li>
         </ul>
@@ -28,27 +26,24 @@
 </template>
 
 <script>
-import { reactive, ref, computed,watch,watchEffect } from 'vue'
+import { reactive, ref, computed, watch, watchEffect } from 'vue'
 export default {
     setup() {
         //描述数据
         const title = ["正在进行", "已经完成"];
         let state;
         // state = [{ id: 1, title: 453254423, completed: false }]
-        if(localStorage.getItem("todos")){
+        if (localStorage.getItem("todos")) {
             state = JSON.parse(localStorage.getItem("todos"));
-        }else{
-            state=[];
-        } 
+        } else {
+            state = [];
+        }
         const todos = reactive(state);
 
-watch(todos, (newValue, oldValue) => {
-    console.log('watch 已触发', newValue);
-    localStorage.setItem('todos', JSON.stringify(newValue))
-});
-
-// const post = await fetch(`/api/post/1`).then((r) => r.json())
-
+        watch(todos, (newValue, oldValue) => {
+            // console.log('watch 已触发', newValue);
+            localStorage.setItem('todos', JSON.stringify(newValue))
+        });
 
         //添加数据
         let newTodo = ref("");
@@ -62,8 +57,13 @@ watch(todos, (newValue, oldValue) => {
             todos.push({ id: nextId, title: newTodo.value, completed: false });
             newTodo.value = "";
             // localStorage.setItem("todos", JSON.stringify(todos));
-
         }
+        // 改变待办事项的状态
+        function changeState(item) {
+            item.completed = !item.completed;
+            // localStorage.setItem("todos", JSON.stringify(todos));
+        }
+
         //删除数据
         let index = 0;
         function removeData(id) {
@@ -72,6 +72,7 @@ watch(todos, (newValue, oldValue) => {
             todos.splice(index, 1);
             // localStorage.setItem("todos", JSON.stringify(todos));
         }
+
         //处理（计算）数据
         let unCompleted = [];
         let completed = []
@@ -82,7 +83,7 @@ watch(todos, (newValue, oldValue) => {
 
 
         //返回数据
-        return { removeData, title, todos, newTodo, addData, unCompleted, completed }
+        return { changeState, removeData, title, todos, newTodo, addData, unCompleted, completed }
     }
 }
 </script>

@@ -1,6 +1,7 @@
 <template>
   <base-todo></base-todo>
   <base-footer></base-footer>
+  <br>
 </template>
 
 <script>
